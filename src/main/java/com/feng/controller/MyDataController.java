@@ -1,6 +1,8 @@
 package com.feng.controller;
 
 import com.feng.service.MyDataService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.sojson.common.controller.BaseController;
 import com.sojson.core.mybatis.page.Pagination;
 import org.apache.log4j.Logger;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +38,23 @@ public class MyDataController extends BaseController {
         Map<String,Object> params = prepareParams(request);
         return myDataService.findPage(params, pageNo, pageSize);
     }
+
+    @RequestMapping("/list1.do")
+    @ResponseBody
+    public Pagination<Map<String,Object>> getListByPageHelper(HttpServletRequest request)throws Exception
+    {
+        logger.info("请求我的数据");
+        Map<String,Object> params = prepareParams(request);
+        PageHelper.startPage(pageNo, pageSize);
+        List<Map<String,Object>> list = myDataService.findPageByPageHelper(params);
+        PageInfo pageInfo = new PageInfo(list);
+        Pagination<Map<String,Object>> page = new Pagination<>(pageInfo.getPageNum(),pageInfo.getPageSize(),(int)pageInfo.getTotal());
+        page.setList(list);
+        return page;
+    }
+
+
+
 
     /**
      * list跳转

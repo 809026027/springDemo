@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,5 +24,10 @@ public class MyDataServiceImpl extends BaseMybatisDao<MyDataMapper> implements M
     @Override
     public Pagination<Map<String, Object>> findPage(Map<String,Object> params, Integer pageNo, Integer pageSize) {
         return super.findPage(params, pageNo, pageSize);
+    }
+
+    @Override
+    public List<Map<String, Object>> findPageByPageHelper(Map<String, Object> params) {
+        return myDataMapper.findAll(params);
     }
 }

@@ -10,6 +10,35 @@
 	<name>springDemo</name>
 	<url>http://maven.apache.org</url>
 
+	<profiles>
+		<!-- 开发环境，默认激活 -->
+		<profile>
+			<id>dev</id>
+			<properties>
+				<runing.env>dev</runing.env>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault><!-- 这里表示默认环境 -->
+			</activation>
+		</profile>
+
+		<!-- 测试环境 -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<runing.env>test</runing.env>
+			</properties>
+		</profile>
+
+		<!-- 生产环境 -->
+		<profile>
+			<id>pro</id>
+			<properties>
+				<runing.env>pro</runing.env>
+			</properties>
+		</profile>
+	</profiles>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -37,6 +66,14 @@
 
 			<resource>
 				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+
+			<resource>
+				<directory>src/main/config/${runing.env}</directory>
 				<includes>
 					<include>**/*.*</include>
 				</includes>
@@ -101,6 +138,16 @@
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jsqlparser</groupId>
+			<artifactId>jsqlparser</artifactId>
+			<version>0.9.5</version>
 		</dependency>
 		<!-- Spring 在 3.2.13版本后，要单独引用 -->
 		<dependency>

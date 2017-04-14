@@ -19,7 +19,9 @@ com\sojson\core\shiro\cache\VCache.class
 com\sojson\common\utils\vcode\SpecCaptcha.class
 com\sojson\core\mybatis\page\SimplePage.class
 com\sojson\core\shiro\listenter\CustomSessionListener.class
+com\feng\dao\MyDataMapper.class
 com\sojson\core\shiro\session\SessionStatus.class
+com\feng\controller\MyDataController.class
 com\sojson\common\utils\DateUtil.class
 com\sojson\user\manager\UserManager.class
 com\sojson\core\shiro\cache\JedisShiroCache.class
@@ -32,11 +34,13 @@ com\sojson\permission\service\PermissionService.class
 com\sojson\common\utils\VinuxPostMethod.class
 com\sojson\core\mybatis\page\Paginable.class
 com\sojson\permission\service\impl\PermissionServiceImpl.class
+com\feng\service\impl\MyDataServiceImpl.class
 com\sojson\common\utils\vcode\GifCaptcha.class
 com\sojson\core\mybatis\page\MysqlDialect.class
 com\sojson\permission\bo\RolePermissionAllocationBo.class
 com\sojson\common\dao\URoleMapper.class
 com\sojson\core\shiro\filter\LoginFilter.class
+com\feng\service\MyDataService.class
 com\sojson\common\utils\SpringContextUtil.class
 com\sojson\user\service\impl\UUserServiceImpl.class
 com\sojson\core\shiro\token\ShiroToken.class

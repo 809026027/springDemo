@@ -23,7 +23,6 @@ import com.sojson.common.utils.StringUtils;
 import com.sojson.core.mybatis.page.MysqlDialect;
 import com.sojson.core.mybatis.page.Pagination;
 
-@SuppressWarnings( { "unchecked" })
 public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 
 	private String NAMESPACE;
@@ -67,10 +66,10 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 		page.setPageSize(pageSize);
 		Configuration c = this.getSqlSession().getConfiguration();
 		int offset = (page.getPageNo() - 1) * page.getPageSize();
-		String page_sql = String.format(" limit %s , %s", offset,pageSize);
-		params.put("page_sql", page_sql);
-		
-		
+		params.put("offset", offset);
+		params.put("limit",pageSize);
+
+
 		BoundSql boundSql = c.getMappedStatement(sqlId).getBoundSql(params);
 		String sqlcode = boundSql.getSql();
 		
@@ -85,15 +84,20 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 			countSql = boundSql;
 		} else {
 			countId = sqlId;
-			
+
 			Map<String,Object> countMap = new HashMap<String,Object>();
 			countMap.putAll(params);
 			countMap.remove("page_sql");//去掉，分页的参数。
 			countSql = c.getMappedStatement(countId).getBoundSql(countMap);
 			countCode = countSql.getSql();
 		}
+		Connection conn = null;
 		try {
-			Connection conn = this.getSqlSession().getConnection();
+			//conn = this.getSqlSession().getConnection();
+			SqlSessionTemplate st = (SqlSessionTemplate) getSqlSession();
+			conn = SqlSessionUtils.getSqlSession(
+					st.getSqlSessionFactory(), st.getExecutorType(),
+					st.getPersistenceExceptionTranslator()).getConnection();
 
 			List<?> resultList = this.getSqlSession().selectList(sqlId, params);
 			page.setList(resultList);
@@ -107,6 +111,15 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 			}
 		} catch (Exception e) {
 			LoggerUtils.error(SELF, "jdbc.error.code.findByPageBySqlId",e);
+		}
+		finally {
+				try {
+					if(conn != null && !conn.isClosed()) {
+						conn.close();
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 		return page;
 	}
@@ -139,7 +152,6 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 	 * @param params
 	 * @param pageNo
 	 * @param pageSize
-	 * @param requiredType	返回的类型[可以不传参]
 	 * @return
 	 */
 	public List findList(Map<String, Object> params, Integer pageNo,
@@ -148,7 +160,7 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 	}
 
 	/**
-	 * 分页
+	 * yonghu 分页
 	 * 
 	 * @param sqlId
 	 *            主语句
@@ -158,8 +170,7 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 	 *            参数
 	 * @param pageNo
 	 *            第几页
-	 * @param pageSize每页显示多少条
-	 * @param requiredType	返回的类型[可以不传参]
+	 * @param pageSize 每页显示多少条
 	 * @return
 	 */
 	public Pagination findPage(String sqlId, String countId,
@@ -172,8 +183,8 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 		Configuration c = this.getSqlSession().getConfiguration();
 		int offset = (page.getPageNo() - 1) * page.getPageSize();
 		String page_sql = String.format(" limit  %s , %s ", offset,pageSize);
-		params.put("page_sql", page_sql);
 
+		params.put("page_sql", page_sql);
 		sqlId =  String.format("%s.%s", NAMESPACE,sqlId) ;
 
 		BoundSql boundSql = c.getMappedStatement(sqlId).getBoundSql(params);
@@ -189,10 +200,11 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 			countSql = c.getMappedStatement(countId).getBoundSql(params);
 			countCode = countSql.getSql();
 		}
+		Connection conn = null;
 		try {
-			//Connection conn = this.getSqlSession().getConnection();
+			//conn = this.getSqlSession().getConnection();
 			SqlSessionTemplate st = (SqlSessionTemplate) getSqlSession();
-			Connection conn = SqlSessionUtils.getSqlSession(
+			conn = SqlSessionUtils.getSqlSession(
 					st.getSqlSessionFactory(), st.getExecutorType(),
 					st.getPersistenceExceptionTranslator()).getConnection();
 
@@ -203,8 +215,7 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 			/**
 			 * 处理Count
 			 */
-			PreparedStatement ps = getPreparedStatement4Count(countCode, countSql
-					.getParameterMappings(), params, conn);
+			PreparedStatement ps = getPreparedStatement4Count(countCode, countSql.getParameterMappings(), params, conn);
 			ps.execute();
 			ResultSet set = ps.getResultSet();
 
@@ -213,6 +224,15 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 			}
 		} catch (Exception e) {
 			LoggerUtils.error(SELF, "jdbc.error.code.findByPageBySqlId",e);
+		}
+		finally {
+			try {
+				if(conn != null && !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return page;
 
@@ -275,6 +295,4 @@ public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
 		}
 		return ps;
 	}
-	
-
 }

@@ -107,7 +107,7 @@
     <script type="text/javascript">
         function goPageByAjax(pageNo)
         {
-            $.post('<%=basePath%>/mydata/list.do',
+            $.post('<%=basePath%>/mydata/list1.do',
                 {
                     name:$("#name").val(),
                     pageNo:pageNo,
