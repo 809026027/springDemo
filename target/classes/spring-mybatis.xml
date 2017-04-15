@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:rdb="http://www.dangdang.com/schema/ddframe/rdb"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -9,46 +10,150 @@
 			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
-			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd"
-			>
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	        http://www.dangdang.com/schema/ddframe/rdb
+		    http://www.dangdang.com/schema/ddframe/rdb/rdb.xsd"
+            >
+	<import resource="spring-sharding.xml"/>
 	<!-- 自动扫描(自动注入) -->
 	<context:component-scan base-package="com.sojson.*.service;com.sojson.*.*.service;com.feng.service"/>
 	<context:component-scan base-package="com.sojson.common.timer"/>
-	
+
 	<bean id="log-filter" class="com.alibaba.druid.filter.logging.Log4jFilter">
     	<property name="resultSetLogEnabled" value="true" />
 	</bean>
-	<!-- 配置数据源 -->
-	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-<!--		<property name="driverClassName" value="${jdbc.driverClassName}" /> -->
-		<property name="url" value="${jdbc.url}" /> 
-		<property name="username" value="${jdbc.username}" /> 
-		<property name="password" value="${jdbc.password}" /> 
-		<property name="initialSize" value="${jdbc.initialSize}" /> 
-	    <property name="minIdle" value="${jdbc.minIdle}" /> 
-	    <property name="maxActive" value="${jdbc.maxActive}" /> 
-	    <property name="maxWait" value="${jdbc.maxWait}" /> 
-	    <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" /> 
-	    <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}" /> 
-	    <property name="validationQuery" value="${jdbc.validationQuery}" /> 
-	    <property name="testWhileIdle" value="${jdbc.testWhileIdle}" /> 
-	    <property name="testOnBorrow" value="${jdbc.testOnBorrow}" /> 
-	    <property name="testOnReturn" value="${jdbc.testOnReturn}" /> 
-	    <property name="removeAbandoned" value="${jdbc.removeAbandoned}" /> 
-	    <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" /> 
-<!--	    <property name="logAbandoned" value="${jdbc.logAbandoned}" /> -->
-	    <property name="filters" value="${jdbc.filters}" />
-		<!-- 关闭abanded连接时输出错误日志 -->
-		<property name="logAbandoned" value="true" />
-		<property name="proxyFilters">
-	        <list>
-	            <ref bean="log-filter"/>
-	        </list>
-	    </property>
 
-		<!-- 监控数据库 -->
-		<!-- <property name="filters" value="stat" /> -->
-<!--		<property name="filters" value="mergeStat" />-->
+	<!-- 配置数据源 -->
+	<bean name="dataSource" class="com.atomikos.jdbc.AtomikosDataSourceBean" destroy-method="close">
+		<!--		<property name="driverClassName" value="${jdbc.driverClassName}" /> -->
+		<property name="uniqueResourceName" value="dataSource" />
+		<property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+		<property name="xaProperties">
+			<props>
+				<prop key="user">${jdbc.username}</prop>
+				<prop key="password">${jdbc.password}</prop>
+				<prop key="url">${jdbc.url}</prop>
+			</props>
+		</property>
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="50" />
+		<property name="maxIdleTime" value="60" />
+	</bean>
+
+	<!-- 配置数据源 -->
+	<bean name="master0" class="com.atomikos.jdbc.AtomikosDataSourceBean"  destroy-method="close">
+		<!--		<property name="driverClassName" value="${jdbc.driverClassName}" /> -->
+		<property name="uniqueResourceName" value="master0" />
+		<property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+		<property name="xaProperties">
+			<props>
+				<prop key="user">${jdbc.username}</prop>
+				<prop key="password">${jdbc.password}</prop>
+				<prop key="url">jdbc:mysql://127.0.0.1:3306/demodb00</prop>
+			</props>
+		</property>
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="50" />
+		<property name="maxIdleTime" value="60" />
+	</bean>
+
+	<!-- 配置数据源 -->
+	<bean name="master1" class="com.atomikos.jdbc.AtomikosDataSourceBean"  destroy-method="close">
+		<!--		<property name="driverClassName" value="${jdbc.driverClassName}" /> -->
+		<property name="uniqueResourceName" value="master1" />
+		<property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+		<property name="xaProperties">
+			<props>
+				<prop key="user">${jdbc.username}</prop>
+				<prop key="password">${jdbc.password}</prop>
+				<prop key="url">jdbc:mysql://127.0.0.1:3306/demodb01</prop>
+			</props>
+		</property>
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="50" />
+		<property name="maxIdleTime" value="60" />
+	</bean>
+<!--
+	<bean id="master0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+		  destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="username" value="root"/>
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/demodb00"/>
+		<property name="password" value="root"/>
+		<property name="maxActive" value="10"/>
+		<property name="initialSize" value="1"/>
+		<property name="maxWait" value="60000"/>
+		<property name="minIdle" value="1"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="minEvictableIdleTimeMillis" value="300000"/>
+		<property name="validationQuery" value="SELECT 'x'"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="testOnBorrow" value="false"/>
+		<property name="testOnReturn" value="false"/>
+		<property name="poolPreparedStatements" value="true"/>
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="50"/>
+		<property name="maxOpenPreparedStatements" value="100"/>
+		<property name="proxyFilters">
+			<list>
+				<ref bean="statFilter"/>
+				<ref bean="logFilter"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="master1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+		  destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="username" value="root"/>
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/demodb01"/>
+		<property name="password" value="root"/>
+		<property name="maxActive" value="10"/>
+		<property name="initialSize" value="1"/>
+		<property name="maxWait" value="60000"/>
+		<property name="minIdle" value="1"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="minEvictableIdleTimeMillis" value="300000"/>
+		<property name="validationQuery" value="SELECT 'x'"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="testOnBorrow" value="false"/>
+		<property name="testOnReturn" value="false"/>
+		<property name="poolPreparedStatements" value="true"/>
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="50"/>
+		<property name="maxOpenPreparedStatements" value="100"/>
+		<property name="proxyFilters">
+			<list>
+				<ref bean="statFilter"/>
+				<ref bean="logFilter"/>
+			</list>
+		</property>
+	</bean>
+
+	<rdb:master-slave-data-source id="rbb_0" master-data-source-ref="master0" slave-data-sources-ref="master0"/>
+	<rdb:master-slave-data-source id="rbb_1" master-data-source-ref="master1" slave-data-sources-ref="master1"/>
+-->
+	<rdb:strategy id="idDbSharding" sharding-columns="id"
+				  algorithm-class="com.feng.splitdbtb.DbAlgorithm"/>
+
+	<rdb:strategy id="idTbSharding" sharding-columns="id"
+				  algorithm-class="com.feng.splitdbtb.TbAlgorithm"/>
+
+	<rdb:data-source id="wholeDataSource">
+		<rdb:sharding-rule data-sources="master0,master1">
+			<rdb:table-rules>
+				<rdb:table-rule logic-table="user" actual-tables="user_${0..1}"
+								database-strategy="idDbSharding" table-strategy="idTbSharding"/>
+			</rdb:table-rules>
+		</rdb:sharding-rule>
+	</rdb:data-source>
+
+	<bean id="sqlSessionFactoryB" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="wholeDataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+		<property name="mapperLocations"  >
+			<list>
+				<value>classpath:com/feng/mapper/user/*.xml</value>
+			</list>
+		</property>
 	</bean>
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -57,7 +162,7 @@
 		<property name="mapperLocations"  >
 			<list>
 				<value>classpath:com/sojson/common/mapper/*.xml</value>
-				<value>classpath:com/feng/mapper/*.xml</value>
+				<value>classpath:com/feng/mapper/my/*.xml</value>
 			</list>
 		</property>
 
@@ -79,20 +184,38 @@
 		</property>
 	</bean>
 
-	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-		<constructor-arg index="0" ref="sqlSessionFactory" />
-	</bean>
-	<bean id="baseMybatisDao" class="com.sojson.core.mybatis.BaseMybatisDao" >
-		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
-	</bean>	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.sojson.common.dao;com.feng.dao" />
+		<property name="basePackage" value="com.sojson.common.dao;com.feng.dao.my" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
-	 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-	     <property name="dataSource" ref="dataSource" />
-	 </bean>
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.feng.dao.user" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryB" />
+	</bean>
+
+	<!-- 定义事务 -->
+	<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
+		  init-method="init" destroy-method="close">
+		<property name="forceShutdown">
+			<value>true</value>
+		</property>
+	</bean>
+
+	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
+		<property name="transactionTimeout" value="300" />
+	</bean>
+
+	<bean id="springTransactionManager"
+		  class="org.springframework.transaction.jta.JtaTransactionManager">
+		<property name="transactionManager">
+			<ref bean="atomikosTransactionManager" />
+		</property>
+		<property name="userTransaction">
+			<ref bean="atomikosUserTransaction" />
+		</property>
+		<property name="allowCustomIsolationLevels" value="true"/>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="springTransactionManager">
 		<tx:attributes>
 			<tx:method name="publish*" />
 			<tx:method name="save*" />
@@ -104,21 +227,23 @@
 			<tx:method name="load*" />
 			<tx:method name="init*" />
 
-
-
-
 			<tx:method name="*"  read-only="true"/>
 		</tx:attributes>
 	</tx:advice>
- 	<!-- AOP配置--> 
+ 	<!-- AOP配置-->
 	<aop:config>
 		<aop:pointcut id="myPointcut"
-			expression="execution(public * com.sojson.*.service.impl.*.*(..))" />
+			expression="execution(public * com.sojson.*.service.impl.*.*(..)) || execution(public * com.feng.service.impl.*.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="myPointcut" />
 	</aop:config>
-<!--	<aop:config>-->
-<!--		<aop:pointcut id="myPointcut"-->
-<!--			expression="execution(public * net.wenyifan.*.service.*.*(..))" />-->
-<!--		<aop:advisor advice-ref="txAdvice" pointcut-ref="myPointcut" />-->
-<!--	</aop:config>-->
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="sqlSessionTemplateB" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactoryB" />
+	</bean>
+	<bean id="baseMybatisDao" class="com.sojson.core.mybatis.BaseMybatisDao" >
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
 </beans>

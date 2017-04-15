@@ -27,6 +27,7 @@
 					  </a>
 					  <ul class="dropdown-menu">
 						  <li><a href="<%=basePath%>/mydata/tolistPage.do">我的数据</a></li>
+						  <li><a href="<%=basePath%>/mydata/toUserPage.do">用户</a></li>
 					  </ul>
 				  </li>
 				<li class="dropdown ">

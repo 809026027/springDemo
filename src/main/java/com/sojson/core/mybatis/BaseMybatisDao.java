@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.SqlSessionUtils;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
@@ -23,7 +24,13 @@ import com.sojson.common.utils.StringUtils;
 import com.sojson.core.mybatis.page.MysqlDialect;
 import com.sojson.core.mybatis.page.Pagination;
 
+import javax.annotation.Resource;
+
 public class BaseMybatisDao<T> extends SqlSessionDaoSupport {
+	@Resource
+	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		super.setSqlSessionFactory(sqlSessionFactory);
+	}
 
 	private String NAMESPACE;
 	final static  Class<? extends Object> SELF = BaseMybatisDao.class;

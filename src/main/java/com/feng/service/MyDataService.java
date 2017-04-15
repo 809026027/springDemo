@@ -12,4 +12,8 @@ public interface MyDataService {
     Pagination<Map<String,Object>> findPage(Map<String,Object> params, Integer pageNo, Integer pageSize);
 
     List<Map<String,Object>> findPageByPageHelper(Map<String, Object> params);
+
+    Map<String,Object> selectByPk(int id);
+
+    int addUser(List<Map<String, Object>> list);
 }

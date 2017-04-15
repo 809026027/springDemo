@@ -19,7 +19,8 @@
 						  数据<span class="caret"></span>
 					  </a>
 					  <ul class="dropdown-menu">
-						  <li><a href="${basePath}/mydata/tolistPage.do">我的数据</a></li>
+						  <li><a href="${basePath}/mydata/toListPage.do">我的数据</a></li>
+                          <li><a href="${basePath}/mydata/toUserPage.do">用户</a></li>
 					  </ul>
 				  </li>
 				<li class="dropdown ${(index==1)?string('active','')}">

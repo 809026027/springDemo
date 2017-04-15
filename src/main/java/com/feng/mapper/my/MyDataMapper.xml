@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feng.dao.my.MyDataMapper" >
+    <select id="findAll" resultType="java.util.HashMap">
+      select id,
+             name,
+             age,
+             DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%S') as createTime
+        from test_table
+        <include refid="where_sql" />
+        <include refid="limit_sql" />
+    </select>
+
+    <select id="findCount" resultType="java.lang.Long">
+        select count(1) from test_table
+        <include refid="where_sql" />
+    </select>
+
+    <sql id="where_sql">
+      <where>
+        <if test="name != null and name != '' ">
+          AND `name` like CONCAT('%',#{name},'%')
+        </if>
+        <if test="createTime != null and createTime != '' ">
+          AND DATE_FORMAT(create_time, '%Y-%m-%d') = #{createTime}
+        </if>
+        <if test="status != null and status != '' ">
+          AND status = #{status}
+        </if>
+      </where>
+    </sql>
+
+    <sql id="limit_sql">
+      <if test="page_sql != null and page_sql != ''">
+        ${page_sql}
+      </if>
+    </sql>
+</mapper>

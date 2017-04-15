@@ -19,7 +19,7 @@ com\sojson\core\shiro\cache\VCache.class
 com\sojson\common\utils\vcode\SpecCaptcha.class
 com\sojson\core\mybatis\page\SimplePage.class
 com\sojson\core\shiro\listenter\CustomSessionListener.class
-com\feng\dao\MyDataMapper.class
+com\feng\splitdbtb\TbAlgorithm.class
 com\sojson\core\shiro\session\SessionStatus.class
 com\feng\controller\MyDataController.class
 com\sojson\common\utils\DateUtil.class
@@ -62,6 +62,7 @@ com\sojson\common\dao\URolePermissionMapper.class
 com\sojson\common\utils\MathUtil.class
 com\sojson\common\model\URole.class
 com\sojson\permission\controller\PermissionController.class
+com\feng\dao\my\MyDataMapper.class
 com\sojson\core\shiro\service\impl\ShiroManagerImpl.class
 com\sojson\core\statics\Constant.class
 com\sojson\user\controller\MemberController.class
@@ -71,6 +72,7 @@ com\sojson\common\model\UUser.class
 com\sojson\permission\bo\UPermissionBo.class
 com\sojson\permission\service\impl\RoleServiceImpl.class
 com\sojson\core\freemarker\extend\Ferrmarker.class
+com\feng\dao\user\MyUserMapper.class
 com\sojson\common\controller\CommonController.class
 com\sojson\core\config\QQConfig.class
 com\sojson\core\shiro\token\SampleRealm.class
@@ -90,6 +92,7 @@ com\sojson\core\shiro\filter\RoleFilter.class
 com\sojson\core\shiro\session\CustomSessionManager.class
 com\sojson\common\utils\StringUtils.class
 com\sojson\common\utils\vcode\Randoms.class
+com\feng\splitdbtb\DbAlgorithm.class
 com\sojson\core\shiro\filter\PermissionFilter.class
 com\sojson\common\dao\UUserMapper.class
 com\sojson\permission\controller\PermissionAllocationController.class

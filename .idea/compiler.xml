@@ -12,7 +12,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="shiro.demo" target="1.7" />
-      <module name="springDemo" target="1.7" />
+      <module name="springDemo" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
